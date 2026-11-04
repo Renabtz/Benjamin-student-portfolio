@@ -85,18 +85,75 @@ if (tl) {
   draw();
 }
 
-// Contact form validation
+// Contact form: client-side validation plus Formspree delivery.
 const cf = document.getElementById('cf');
-if (cf) cf.addEventListener('submit', e => {
-  e.preventDefault();
-  const f = {n:'Enter your name.', e:'Enter a valid email address.', m:'Write a message of at least 10 characters.'};
-  let ok = true;
-  for (const id in f) {
-    const el = document.getElementById(id), v = el.value.trim();
-    const bad = !v || (id==='e' && !/^\S+@\S+\.\S+$/.test(v)) || (id==='m' && v.length<10);
-    document.getElementById(id+'-e').textContent = bad ? f[id] : '';
-    if (bad) ok = false;
+if (cf) {
+  const fields = {
+    n: { input: document.getElementById('n'), error: document.getElementById('n-e'), message: 'Please enter at least 2 characters for your name.' },
+    e: { input: document.getElementById('e'), error: document.getElementById('e-e'), message: 'Please enter a valid email address.' },
+    m: { input: document.getElementById('m'), error: document.getElementById('m-e'), message: 'Please write a message of at least 10 characters.' }
+  };
+  const status = document.getElementById('cf-ok');
+  const submit = cf.querySelector('button[type="submit"]');
+  const configuredAction = /^https:\/\/formspree\.io\/f\/[A-Za-z0-9]+$/.test(cf.action);
+
+  function validate(key) {
+    const {input, error, message} = fields[key];
+    const value = input.value.trim();
+    let valid = value.length > 0;
+    if (key === 'n') valid = value.length >= 2;
+    if (key === 'e') valid = input.validity.valid && value.length > 0;
+    if (key === 'm') valid = value.length >= 10;
+    input.setAttribute('aria-invalid', String(!valid));
+    error.textContent = valid ? '' : message;
+    return valid;
   }
-  document.getElementById('cf-ok').textContent = ok ? 'Message sent. Thank you! (Connect Formspree to deliver it.)' : '';
-  if (ok) cf.reset();
-});
+
+  Object.entries(fields).forEach(([key, {input}]) => {
+    input.addEventListener('blur', () => validate(key));
+    input.addEventListener('input', () => {
+      if (input.getAttribute('aria-invalid') === 'true') validate(key);
+      status.textContent = '';
+    });
+  });
+
+  cf.addEventListener('submit', async event => {
+    event.preventDefault();
+    status.textContent = '';
+    const valid = Object.keys(fields).map(validate).every(Boolean);
+    if (!valid) {
+      status.textContent = 'Please review the highlighted fields and try again.';
+      Object.values(fields).find(({input}) => input.getAttribute('aria-invalid') === 'true')?.input.focus();
+      return;
+    }
+
+    // Honeypot: silently reject likely automated submissions.
+    if (cf.elements._gotcha.value.trim()) return;
+
+    if (!configuredAction) {
+      status.textContent = 'The form is not connected yet. Please configure its Formspree form ID before accepting messages.';
+      return;
+    }
+
+    submit.disabled = true;
+    status.textContent = 'Sending your message…';
+    try {
+      const response = await fetch(cf.action, {
+        method: 'POST',
+        body: new FormData(cf),
+        headers: {Accept: 'application/json'}
+      });
+      if (!response.ok) throw new Error('Form submission failed');
+      cf.reset();
+      Object.entries(fields).forEach(([key, {input, error}]) => {
+        input.setAttribute('aria-invalid', 'false');
+        error.textContent = '';
+      });
+      status.textContent = 'Your message was sent. Thank you!';
+    } catch {
+      status.textContent = 'Sorry, your message could not be sent. Please try again later.';
+    } finally {
+      submit.disabled = false;
+    }
+  });
+}

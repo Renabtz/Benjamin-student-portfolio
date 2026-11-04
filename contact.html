@@ -1,17 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Contact | Benjamin James</title>
-<meta name="description" content="Benjamin James's academic portfolio, featuring his cybersecurity studies, skills, projects, and academic progress.">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<meta name="description" content="Get in touch with Benjamin James about cybersecurity, internships, research, and collaboration.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 <header><div class="wrap">
 <a class="logo" href="index.html">Benjamin James</a>
-<button id="menu-btn" aria-expanded="false" aria-controls="nav-list">Menu</button>
+<button id="menu-btn" aria-expanded="false" aria-controls="nav-list" type="button">Menu</button>
 <nav aria-label="Main"><ul id="nav-list">
 <li><a href="index.html">Home</a></li>
 <li><a href="about.html">About</a></li>
@@ -21,14 +23,33 @@
 </ul></nav></div></header>
 <main><div class="wrap">
 <h1>Contact</h1>
-<p class="lead">Send a message, or email me at <a href="mailto:you@example.com">you@example.com</a>.</p>
-<form id="cf" class="card" novalidate style="max-width:560px">
-<label for="n">Name</label><input id="n" required><div class="err" id="n-e"></div>
-<label for="e">Email</label><input id="e" type="email" required><div class="err" id="e-e"></div>
-<label for="m">Message</label><textarea id="m" rows="5" required></textarea><div class="err" id="m-e"></div>
+<p class="lead">I’m open to internships, research opportunities, collaborative projects, and cybersecurity discussions. Send me a message or connect with me on <a href="https://github.com/Renabtz" target="_blank" rel="noopener noreferrer">GitHub</a>.</p>
+
+<form id="cf" class="card" action="https://formspree.io/f/REPLACE_WITH_FORM_ID" method="POST" novalidate style="max-width:560px">
+<!-- Configure a real Formspree form ID in the action URL before publishing. -->
+<input type="hidden" name="_subject" value="New message from Benjamin James's portfolio">
+<div aria-hidden="true" style="position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden">
+<label for="website">Leave this field empty</label>
+<input id="website" name="_gotcha" type="text" tabindex="-1" autocomplete="off">
+</div>
+
+<label for="n">Name</label>
+<input id="n" name="name" type="text" autocomplete="name" required minlength="2" maxlength="100" aria-describedby="n-e" aria-invalid="false">
+<div class="err" id="n-e"></div>
+
+<label for="e">Email</label>
+<input id="e" name="email" type="email" autocomplete="email" inputmode="email" required maxlength="254" aria-describedby="e-e" aria-invalid="false">
+<div class="err" id="e-e"></div>
+
+<label for="m">Message</label>
+<textarea id="m" name="message" rows="6" required minlength="10" maxlength="3000" aria-describedby="m-e" aria-invalid="false"></textarea>
+<div class="err" id="m-e"></div>
+
 <button class="btn" type="submit">Send message</button>
-<p id="cf-ok" role="status"></p></form>
+<p id="cf-ok" role="status" aria-live="polite"></p>
+</form>
 </div></main>
 <footer><div class="wrap">&copy; <span id="yr">2026</span> Benjamin James. Built with HTML, CSS and JavaScript.</div></footer>
-<script src="js/main.js"></script>
-</body></html>
+<script src="main.js"></script>
+</body>
+</html>
